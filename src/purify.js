@@ -314,6 +314,7 @@ function createDOMPurify(window = getGlobal()) {
     'xmlns',
   ]);
 
+  /* Specify the maximum element nesting depth to prevent mXSS */
   const MAX_NESTING_DEPTH = 255;
 
   /* Keep a reference to config to pass to hooks */
@@ -587,6 +588,9 @@ function createDOMPurify(window = getGlobal()) {
     }
 
     if (
+      (typeof elm.__depth !== 'undefined' && typeof elm.__depth !== 'number') ||
+      (typeof elm.__removalCount !== 'undefined' &&
+        typeof elm.__removalCount !== 'number') ||
       typeof elm.nodeName !== 'string' ||
       typeof elm.textContent !== 'string' ||
       typeof elm.removeChild !== 'function' ||
@@ -691,6 +695,15 @@ function createDOMPurify(window = getGlobal()) {
               ? trustedTypesPolicy.createHTML(htmlToInsert)
               : htmlToInsert
           );
+          /*
+             Count removals for an accurate element nesting depth
+             measurement to prevent mXSS attacks
+          */
+          const index = Array.from(currentNode.parentNode.childNodes).indexOf(
+            currentNode
+          );
+          const newNode = currentNode.parentNode.childNodes[index + 1];
+          newNode.__removalCount = (currentNode.__removalCount || 0) + 1;
         } catch (_) {}
       }
 
@@ -1157,8 +1170,30 @@ function createDOMPurify(window = getGlobal()) {
         continue;
       }
 
+      /* Set the nesting depth of an element */
+      if (currentNode.nodeType === 1) {
+        if (currentNode.parentNode && currentNode.parentNode.__depth) {
+          /*
+            We want the depth of the node in the original tree, which can
+            change when it's removed from its parent.
+          */
+          currentNode.__depth =
+            (currentNode.__removalCount || 0) +
+            currentNode.parentNode.__depth +
+            1;
+        } else {
+          currentNode.__depth = 1;
+        }
+      }
+
+      /* Remove an element if nested too deeply to avoid mXSS */
+      if (currentNode.__depth >= MAX_NESTING_DEPTH) {
+        _forceRemove(currentNode);
+      }
+
       /* Shadow DOM detected, sanitize it */
       if (currentNode.content instanceof DocumentFragment) {
+        currentNode.content.__depth = currentNode.__depth;
         _sanitizeShadowDOM(currentNode.content);
       }
 
