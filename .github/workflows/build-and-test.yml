@@ -48,5 +48,5 @@ jobs:
         env:
           TEST_BROWSERSTACK: ${{ startsWith(matrix.node-version, '13') }}
           TEST_PROBE_ONLY: ${{ github.ref != 'refs/heads/main' }}
-          BS_USERNAME: dompurify_NmY75SUZy6s
-          BS_ACCESSKEY: 5rPiVx78fQ2agk8qTgop
+          BS_USERNAME: aaronbelenky_lLszYW
+          BS_ACCESSKEY: PxMt6ujDT3Npt7SQDnqt
