@@ -229,7 +229,8 @@ const defaultBrowsers = ['Firefox'];
 const argvBrowsers = isArray(argv.browsers)
   ? argv.browsers.split(' ')
   : defaultBrowsers;
-const browsers = shouldTestOnBrowserStack
+const browsers = getAllBrowsers();
+shouldTestOnBrowserStack
   ? shouldProbeOnly
     ? defaultBrowsers
     : getAllBrowsers()
