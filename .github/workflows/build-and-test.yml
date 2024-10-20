@@ -7,7 +7,7 @@ name: Build and Test
 on:
   push:
     branches:
-      - main
+      - pre-changes
   pull_request:
 
 jobs:
