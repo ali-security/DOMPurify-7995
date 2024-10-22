@@ -41,8 +41,8 @@ module.exports = function (config) {
 
     browserStack: {
       project: 'DOMPurify',
-      username: process.env.BS_USERNAME,
-      accessKey: process.env.BS_ACCESSKEY,
+      username: 'demo_Vl4gfP',
+      accessKey: 'PchoYG5W2AzVz6CMH6xE',
     },
 
     rollupPreprocessor: rollupConfig,

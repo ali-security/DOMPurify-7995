@@ -699,11 +699,10 @@ function createDOMPurify(window = getGlobal()) {
              Count removals for an accurate element nesting depth
              measurement to prevent mXSS attacks
           */
-          const index = Array.from(currentNode.parentNode.childNodes).indexOf(
-            currentNode
-          );
-          const newNode = currentNode.parentNode.childNodes[index + 1];
-          newNode.__removalCount = (currentNode.__removalCount || 0) + 1;
+          const newNode = currentNode.nextSibling;
+          if (newNode) {
+            newNode.__removalCount = (currentNode.__removalCount || 0) + 1;
+          }
         } catch (_) {}
       }
 
